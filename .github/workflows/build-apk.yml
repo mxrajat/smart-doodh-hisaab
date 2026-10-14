@@ -1,0 +1,101 @@
+# ============================================================
+#  Smart Doodh Hisaab — Android APK Build (Cloud)
+#  Push/PR hote hi cloud par APK ban jaayega bina Android Studio ke!
+# ============================================================
+
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  # Haath se bhi trigger kar sakte hain GitHub UI se
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    name: 🏗️ Build Smart-Doodh-Hisaab APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Code checkout ──
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # ── 2. Java (JDK 17 for Gradle/Android) ──
+      - name: ☕ Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # ── 3. Node.js for Capacitor CLI ──
+      - name: 📦 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ── 4. Android SDK setup ──
+      - name: 🤖 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # ── 5. Install npm dependencies ──
+      - name: 📦 Install npm dependencies
+        run: npm install
+
+      # ── 6. Build web assets (copy to www/) ──
+      - name: 🌐 Build web assets
+        run: npm run build
+
+      # ── 7. Add Android platform if not present ──
+      - name: 📱 Add Capacitor Android platform
+        run: npx cap add android || true
+
+      # ── 8. Sync web assets to Android project ──
+      - name: 🔄 Sync Capacitor
+        run: npx cap sync android
+
+      # ── 9. Make gradlew executable ──
+      - name: 🔧 Make gradlew executable
+        run: chmod +x android/gradlew
+
+      # ── 10. Build Debug APK ──
+      - name: 🏗️ Build Debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      # ── 11. Rename APK to a clean name ──
+      - name: 📝 Rename APK
+        run: |
+          APK_PATH=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -1)
+          cp "$APK_PATH" Smart-Doodh-Hisaab.apk
+          echo "✅ APK built successfully!"
+          ls -lh Smart-Doodh-Hisaab.apk
+
+      # ── 12. Upload APK as downloadable artifact ──
+      - name: 📤 Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Smart-Doodh-Hisaab-APK
+          path: Smart-Doodh-Hisaab.apk
+          retention-days: 90
+          if-no-files-found: error
+
+      # ── 13. Build summary ──
+      - name: 📊 Build Summary
+        run: |
+          echo "## 🥛 Smart Doodh Hisaab - Build Complete! ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Detail |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| 📱 APK | \`Smart-Doodh-Hisaab.apk\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 Size | $(du -h Smart-Doodh-Hisaab.apk | cut -f1) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔧 Build Type | Debug |" >> $GITHUB_STEP_SUMMARY
+          echo "| ☕ Java | $(java -version 2>&1 | head -1) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 Node | $(node --version) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Download kaise karein?" >> $GITHUB_STEP_SUMMARY
+          echo "1. Upar **Artifacts** section mein jaayein" >> $GITHUB_STEP_SUMMARY
+          echo "2. **Smart-Doodh-Hisaab-APK** par click karein" >> $GITHUB_STEP_SUMMARY
+          echo "3. ZIP download hoga, usme se APK nikal kar phone mein install karein" >> $GITHUB_STEP_SUMMARY

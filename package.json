@@ -1,0 +1,24 @@
+{
+  "name": "smart-doodh-hisaab",
+  "version": "1.0.0",
+  "description": "Dairy/Doodh ka smart hisaab - Customer, Daily Entry, Bill, Kharcha sab ek jagah!",
+  "main": "index.html",
+  "scripts": {
+    "build": "mkdir -p www/css www/js && cp index.html www/ && cp manifest.json www/ && cp css/style.css www/css/ && cp js/app.js www/js/",
+    "cap:sync": "npx cap sync android",
+    "cap:copy": "npx cap copy android"
+  },
+  "keywords": ["dairy", "milk", "hisaab", "doodh"],
+  "author": "Smart Doodh Hisaab",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/haptics": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  }
+}

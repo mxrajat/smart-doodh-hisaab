@@ -1,0 +1,21 @@
+{
+  "appId": "com.smartdoodhhisaab.app",
+  "appName": "Smart Doodh Hisaab",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "StatusBar": {
+      "backgroundColor": "#1565C0",
+      "style": "DARK"
+    }
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#F0F2F5",
+    "buildOptions": {
+      "signingType": "apksigner"
+    }
+  }
+}
